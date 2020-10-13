@@ -159,260 +159,264 @@ Adding a Unit (POST)
 
 This code example is a PHP script that will add a unit (i.e. offer) to the item we got in the previous example. This is an example of a POST request. This is the same script as the one on the Getting Started page. Please notice that you have to specify a listing price greater than zero.
 
-<?php
+			<?php
 
-function signRequest($method, $uri, $body, $timestamp, $secretKey)
-{
-	$string = implode("\n", [
-		$method,
-		$uri,
-		$body,
-		$timestamp,
-	]);
-	
-	return hash_hmac('sha256', $string, $secretKey);
-}
+			function signRequest($method, $uri, $body, $timestamp, $secretKey)
+			{
+				$string = implode("\n", [
+					$method,
+					$uri,
+					$body,
+					$timestamp,
+				]);
 
-$baseUrl = 'https://www.real.de/api/v1';
+				return hash_hmac('sha256', $string, $secretKey);
+			}
 
-// Credentials for the API
-$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
-$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
+			$baseUrl = 'https://www.real.de/api/v1';
 
-// Define the POST data
-$data = [
-	"ean"           => "9780470527580",
-	"condition"     => "new",
-	"listing_price" => 4550,
-	"minimum_price" => 3990,
-	"amount"        => 9,
-    "delivery_time_min" => 2,
-	"delivery_time_max" => 5,
-	"location"      => "DE"
-];
+			// Credentials for the API
+			$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
+			$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
 
-$jsonData = json_encode($data);
+			// Define the POST data
+			$data = [
+				"ean"           => "9780470527580",
+				"condition"     => "new",
+				"listing_price" => 4550,
+				"minimum_price" => 3990,
+				"amount"        => 9,
+			    "delivery_time_min" => 2,
+				"delivery_time_max" => 5,
+				"location"      => "DE"
+			];
 
-// We're adding a new unit
-$uri = $baseUrl . '/units/';
+			$jsonData = json_encode($data);
 
-// Current Unix timestamp in seconds
-$timestamp = time();
+			// We're adding a new unit
+			$uri = $baseUrl . '/units/';
 
-// Define all the mandatory headers
-$headers = [
-    'Accept: application/json',
-    'Hm-Client: ' . $clientKey,
-    'Hm-Timestamp: ' . $timestamp,
-    'Hm-Signature: ' . signRequest('POST', $uri, $jsonData, $timestamp, $secretKey),
-];
+			// Current Unix timestamp in seconds
+			$timestamp = time();
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $uri);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-curl_setopt($ch, CURLOPT_HEADER, 1);
-curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+			// Define all the mandatory headers
+			$headers = [
+			    'Accept: application/json',
+			    'Hm-Client: ' . $clientKey,
+			    'Hm-Timestamp: ' . $timestamp,
+			    'Hm-Signature: ' . signRequest('POST', $uri, $jsonData, $timestamp, $secretKey),
+			];
 
-$response = curl_exec($ch);
-list($header, $body) = explode("\r\n\r\n", $response, 2);
-print("$header\n\n");
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $uri);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+			curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 
-$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-print("HTTP Response Code: $responseCode\n");
-curl_close($ch);
+			$response = curl_exec($ch);
+			list($header, $body) = explode("\r\n\r\n", $response, 2);
+			print("$header\n\n");
 
-If you run this script, it will output the response headers and the success response code 204:
+			$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			print("HTTP Response Code: $responseCode\n");
+			curl_close($ch);
 
-HTTP Response Code: 204
+			If you run this script, it will output the response headers and the success response code 204:
 
-One of the response headers is the location of the API endpoint for the newly-created unit, which we will use in the next code example:
+			HTTP Response Code: 204
 
-Location: /units/151177892008/
+			One of the response headers is the location of the API endpoint for the newly-created unit, which we will use in the next code example:
 
-Deleting a Unit (DELETE)
+			Location: /units/151177892008/
 
-This code example is a PHP script that will delete the unit that was added in the last example. This is an example of a DELETE request.
+			Deleting a Unit (DELETE)
 
-<?php
-function signRequest($method, $uri, $body, $timestamp, $secretKey)
-{
-	$string = implode("\n", [
-		$method,
-		$uri,
-		$body,
-		$timestamp,
-	]);
-	
-	return hash_hmac('sha256', $string, $secretKey);
-}
+			This code example is a PHP script that will delete the unit that was added in the last example. This is an example of a DELETE request.
 
-$baseUrl = 'https://www.real.de/api/v1';
+			<?php
+			function signRequest($method, $uri, $body, $timestamp, $secretKey)
+			{
+				$string = implode("\n", [
+					$method,
+					$uri,
+					$body,
+					$timestamp,
+				]);
 
-// Credentials for the API
-$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
-$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
+				return hash_hmac('sha256', $string, $secretKey);
+			}
 
-// We're deleting the unit with id_unit=99792311008
-// We got this URL from the headers returned when we created the unit
-$uri = $baseUrl . '/units/151177892008/';
+			$baseUrl = 'https://www.real.de/api/v1';
 
-// Current Unix timestamp in seconds
-$timestamp = time();
+			// Credentials for the API
+			$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
+			$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
 
-// Define all the mandatory headers
-$headers = [
-    'Accept: application/json',
-    'Hm-Client: ' . $clientKey,
-    'Hm-Timestamp: ' . $timestamp,
-    'Hm-Signature: ' . signRequest('DELETE', $uri, '', $timestamp, $secretKey),
-];
+			// We're deleting the unit with id_unit=99792311008
+			// We got this URL from the headers returned when we created the unit
+			$uri = $baseUrl . '/units/151177892008/';
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $uri);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HEADER, 1);
-curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+			// Current Unix timestamp in seconds
+			$timestamp = time();
 
-$response = curl_exec($ch);
-list($header, $body) = explode("\r\n\r\n", $response, 2);
-print("$header\n\n");
+			// Define all the mandatory headers
+			$headers = [
+			    'Accept: application/json',
+			    'Hm-Client: ' . $clientKey,
+			    'Hm-Timestamp: ' . $timestamp,
+			    'Hm-Signature: ' . signRequest('DELETE', $uri, '', $timestamp, $secretKey),
+			];
 
-$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-print("HTTP Response Code: $responseCode\n");
-curl_close($ch);
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $uri);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+			curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 
-If you run this script, it will output the response headers and the success response code 204:
+			$response = curl_exec($ch);
+			list($header, $body) = explode("\r\n\r\n", $response, 2);
+			print("$header\n\n");
+
+			$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			print("HTTP Response Code: $responseCode\n");
+			curl_close($ch);
+
+
+#### If you run this script, it will output the response headers and the success response code 204:
 
 HTTP Response Code: 204
 
 Opening a Claim (POST)
 
-This code example is a PHP script that will open a new claim on an order unit. This is an example of a POST request.
 
-<?php
+#### This code example is a PHP script that will open a new claim on an order unit. This is an example of a POST request.
 
-function signRequest($method, $uri, $body, $timestamp, $secretKey)
-{
-	$string = implode("\n", [
-		$method,
-		$uri,
-		$body,
-		$timestamp,
-	]);
-	
-	return hash_hmac('sha256', $string, $secretKey);
-}
+			<?php
 
-$baseUrl = 'https://www.real.de/api/v1';
+			function signRequest($method, $uri, $body, $timestamp, $secretKey)
+			{
+				$string = implode("\n", [
+					$method,
+					$uri,
+					$body,
+					$timestamp,
+				]);
 
-// Credentials for the API
-$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
-$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
+				return hash_hmac('sha256', $string, $secretKey);
+			}
 
-// Define the POST data
-$data = [
-	"id_order_unit" => 314567837137231,
-	"text" => "The customer never paid.",
-];
+			$baseUrl = 'https://www.real.de/api/v1';
 
-$jsonData = json_encode($data);
+			// Credentials for the API
+			$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
+			$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
 
-// We're adding a new claim
-$uri = $baseUrl . '/claims/';
+			// Define the POST data
+			$data = [
+				"id_order_unit" => 314567837137231,
+				"text" => "The customer never paid.",
+			];
 
-// Current Unix timestamp in seconds
-$timestamp = time();
+			$jsonData = json_encode($data);
 
-// Define all the mandatory headers
-$headers = [
-    'Accept: application/json',
-    'Hm-Client: ' . $clientKey,
-    'Hm-Timestamp: ' . $timestamp,
-    'Hm-Signature: ' . signRequest('POST', $uri, $jsonData, $timestamp, $secretKey),
-];
+			// We're adding a new claim
+			$uri = $baseUrl . '/claims/';
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $uri);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-curl_setopt($ch, CURLOPT_HEADER, 1);
-curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+			// Current Unix timestamp in seconds
+			$timestamp = time();
 
-$response = curl_exec($ch);
-list($header, $body) = explode("\r\n\r\n", $response, 2);
-print("$header\n\n");
+			// Define all the mandatory headers
+			$headers = [
+			    'Accept: application/json',
+			    'Hm-Client: ' . $clientKey,
+			    'Hm-Timestamp: ' . $timestamp,
+			    'Hm-Signature: ' . signRequest('POST', $uri, $jsonData, $timestamp, $secretKey),
+			];
 
-$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-print("HTTP Response Code: $responseCode\n");
-curl_close($ch);
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $uri);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+			curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 
-If you run this example, a new claim will be opened on order unit 314567837137231 and the text will be sent to the customer. The script will print out all of the headers returned by the request, including this line:
+			$response = curl_exec($ch);
+			list($header, $body) = explode("\r\n\r\n", $response, 2);
+			print("$header\n\n");
+
+			$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			print("HTTP Response Code: $responseCode\n");
+			curl_close($ch);
+
+			If you run this example, a new claim will be opened on order unit 314567837137231 and the text will be sent to the customer. The script will print out all of the headers returned by the request, including this line:
+
 
 Location: /claims/2498572/
+
 
 This is the URL of the new claim's GET endpoint and 2498572 is the new claim's id_claim.
 Closing a Claim (PATCH)
 
 This code example is a PHP script that will close the claim opened in the previous example. This is an example of a PATCH request.
 
-<?php
+			<?php
 
-function signRequest($method, $uri, $body, $timestamp, $secretKey)
-{
-	$string = implode("\n", [
-		$method,
-		$uri,
-		$body,
-		$timestamp,
-	]);
-	
-	return hash_hmac('sha256', $string, $secretKey);
-}
+			function signRequest($method, $uri, $body, $timestamp, $secretKey)
+			{
+				$string = implode("\n", [
+					$method,
+					$uri,
+					$body,
+					$timestamp,
+				]);
 
-$baseUrl = 'https://www.real.de/api/v1';
+				return hash_hmac('sha256', $string, $secretKey);
+			}
 
-// Credentials for the API
-$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
-$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
+			$baseUrl = 'https://www.real.de/api/v1';
 
-// We're closing the claim with id_claim=2498572
-$uri = $baseUrl . '/claims/2498572/close/';
+			// Credentials for the API
+			$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
+			$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
 
-// Current Unix timestamp in seconds
-$timestamp = time();
+			// We're closing the claim with id_claim=2498572
+			$uri = $baseUrl . '/claims/2498572/close/';
 
-// Define all the mandatory headers
-$headers = [
-    'Accept: application/json',
-    'Hm-Client: ' . $clientKey,
-    'Hm-Timestamp: ' . $timestamp,
-    'Hm-Signature: ' . signRequest('PATCH', $uri, null, $timestamp, $secretKey),
-];
+			// Current Unix timestamp in seconds
+			$timestamp = time();
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $uri);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HEADER, 1);
-curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+			// Define all the mandatory headers
+			$headers = [
+			    'Accept: application/json',
+			    'Hm-Client: ' . $clientKey,
+			    'Hm-Timestamp: ' . $timestamp,
+			    'Hm-Signature: ' . signRequest('PATCH', $uri, null, $timestamp, $secretKey),
+			];
 
-$response = curl_exec($ch);
-list($header, $body) = explode("\r\n\r\n", $response, 2);
-print("$header\n\n");
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $uri);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+			curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 
-$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-print("HTTP Response Code: $responseCode\n");
-curl_close($ch);
+			$response = curl_exec($ch);
+			list($header, $body) = explode("\r\n\r\n", $response, 2);
+			print("$header\n\n");
 
-If you run this script, it will output the response headers and the success response code 204:
+			$responseCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			print("HTTP Response Code: $responseCode\n");
+			curl_close($ch);
 
-HTTP Response Code: 204
+			If you run this script, it will output the response headers and the success response code 204:
+
+			HTTP Response Code: 204
 
