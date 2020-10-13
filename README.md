@@ -39,119 +39,121 @@ Getting an Item (GET)
 
 This code listing is a standalone PHP script that will query the API for a product with a known ID and output all of its properties. This is an example of a GET request.
 
-<?php
 
-function signRequest($method, $uri, $body, $timestamp, $secretKey)
-{
-	$string = implode("\n", [
-		$method,
-		$uri,
-		$body,
-		$timestamp,
-	]);
 
-	return hash_hmac('sha256', $string, $secretKey);
-}
+			<?php
 
-$baseUrl = 'https://www.real.de/api/v1';
+			function signRequest($method, $uri, $body, $timestamp, $secretKey)
+			{
+				$string = implode("\n", [
+					$method,
+					$uri,
+					$body,
+					$timestamp,
+				]);
 
-// Credentials for the API
-$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
-$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
+				return hash_hmac('sha256', $string, $secretKey);
+			}
 
-// We are going to get information about the product with ID 20574181
-// (at the URL https://www.real.de/product/20574181/)
-$uri = $baseUrl . '/items/20574181/';
+			$baseUrl = 'https://www.real.de/api/v1';
 
-// Also include the item's category and units in the response
-$params = [
-	'embedded' => 'category,units',
-];
+			// Credentials for the API
+			$clientKey = '35f5dba43b471cd2ad28fd68e4825e2b';
+			$secretKey = 'b3575f222f7b768c25160b879699118b331c6883dd6010864b7ead130be77cd5';
 
-//The query parameters must be URL-encoded, but the "=" and "&" signs should not be encoded
-$uri .= '?' . http_build_query($params);
+			// We are going to get information about the product with ID 20574181
+			// (at the URL https://www.real.de/product/20574181/)
+			$uri = $baseUrl . '/items/20574181/';
 
-// Current Unix timestamp in seconds
-$timestamp = time();
+			// Also include the item's category and units in the response
+			$params = [
+				'embedded' => 'category,units',
+			];
 
-// Define all the mandatory headers
-$headers = [
-	'Accept: application/json',
-	'Hm-Client: ' . $clientKey,
-	'Hm-Timestamp: ' . $timestamp,
-	'Hm-Signature: ' . signRequest('GET', $uri, '', $timestamp, $secretKey),
-];
+			//The query parameters must be URL-encoded, but the "=" and "&" signs should not be encoded
+			$uri .= '?' . http_build_query($params);
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $uri);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			// Current Unix timestamp in seconds
+			$timestamp = time();
 
-$item = json_decode(curl_exec($ch), true);
-var_export($item);
-curl_close($ch);
+			// Define all the mandatory headers
+			$headers = [
+				'Accept: application/json',
+				'Hm-Client: ' . $clientKey,
+				'Hm-Timestamp: ' . $timestamp,
+				'Hm-Signature: ' . signRequest('GET', $uri, '', $timestamp, $secretKey),
+			];
 
-When executed, the above code will print the following result:
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $uri);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-{
-	"id_item": 20574181,
-	"title": "PHP and MySQL for Dummies",
-	"eans": {
-		0: "9780470527580"
-	},
-	"id_category": 53021,
-	"main_picture": "https://media.real.de/images/items/original/567ff112bb416618b057802817dfe1d2.jpg",
-	"manufacturer": "For Dummies",
-	"url": "https://www.real.de/product/20574181/",
-	"category": {
-		"id_category": 53021,
-		"name": "naturwissenschaften-medizin-informatik-und-technik-buecher",
-		"id_parent_category": 6261,
-		"title_singular": "Naturwissenschaften, Medizin, Informatik & Technik",
-		"title_plural": "Naturwissenschaften, Medizin, Informatik & Technik",
-		"level": 3,
-		"url": "https://www.real.de/naturwissenschaften-medizin-informatik-und-technik-buecher/",
-		"shipping_category": "A",
-		"variable_fee": "12.50",
-		"fixed_fee": 0,
-		"vat": "7.00"
-	},
-	"units": {
-		0: {
-			"id_unit": 99792311008,
-			"id_item": 20574181,
-			"condition": "new",
-			"location": "DE",
-			"warehouse": "Theresa GmbH - Lager: 1024",
-			"amount": 1,
-			"price": 2639,
-			"delivery_time_min": 3,
-			"delivery_time_max": 8,
-			"shipping_group": null,
-			"note": "Versand durch DHL",
-			"seller": {
-				"pseudonym": "Tolle Buecher"
-			},
-			"shipping_rate": 0
-		},
-		1: {
-			"id_unit": 105194581008,
-			"id_item": 20574181,
-			"condition": "new",
-			"location": "DE",
-			"warehouse": "Kevin GmbH - Lager: 1262"
-			"amount": 1,
-			"price": 2890,
-			"delivery_time_min": 2,
-			"delivery_time_max": 6,
-			"shipping_group" "paket",
-			"note": "Bei Fragen helfen wir gerne.",
-			"seller": {
-				"pseudonym": "Buecherland"
-			},
-			"shipping_rate": 430
-		}
-}
+			$item = json_decode(curl_exec($ch), true);
+			var_export($item);
+			curl_close($ch);
+
+			When executed, the above code will print the following result:
+
+			{
+				"id_item": 20574181,
+				"title": "PHP and MySQL for Dummies",
+				"eans": {
+					0: "9780470527580"
+				},
+				"id_category": 53021,
+				"main_picture": "https://media.real.de/images/items/original/567ff112bb416618b057802817dfe1d2.jpg",
+				"manufacturer": "For Dummies",
+				"url": "https://www.real.de/product/20574181/",
+				"category": {
+					"id_category": 53021,
+					"name": "naturwissenschaften-medizin-informatik-und-technik-buecher",
+					"id_parent_category": 6261,
+					"title_singular": "Naturwissenschaften, Medizin, Informatik & Technik",
+					"title_plural": "Naturwissenschaften, Medizin, Informatik & Technik",
+					"level": 3,
+					"url": "https://www.real.de/naturwissenschaften-medizin-informatik-und-technik-buecher/",
+					"shipping_category": "A",
+					"variable_fee": "12.50",
+					"fixed_fee": 0,
+					"vat": "7.00"
+				},
+				"units": {
+					0: {
+						"id_unit": 99792311008,
+						"id_item": 20574181,
+						"condition": "new",
+						"location": "DE",
+						"warehouse": "Theresa GmbH - Lager: 1024",
+						"amount": 1,
+						"price": 2639,
+						"delivery_time_min": 3,
+						"delivery_time_max": 8,
+						"shipping_group": null,
+						"note": "Versand durch DHL",
+						"seller": {
+							"pseudonym": "Tolle Buecher"
+						},
+						"shipping_rate": 0
+					},
+					1: {
+						"id_unit": 105194581008,
+						"id_item": 20574181,
+						"condition": "new",
+						"location": "DE",
+						"warehouse": "Kevin GmbH - Lager: 1262"
+						"amount": 1,
+						"price": 2890,
+						"delivery_time_min": 2,
+						"delivery_time_max": 6,
+						"shipping_group" "paket",
+						"note": "Bei Fragen helfen wir gerne.",
+						"seller": {
+							"pseudonym": "Buecherland"
+						},
+						"shipping_rate": 430
+					}
+			}
 
 Adding a Unit (POST)
 
